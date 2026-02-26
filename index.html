@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sentence Builder App</title>
+
+<style>
+body{
+  font-family: Arial;
+  background:#eef2f7;
+  margin:0;
+  text-align:center;
+}
+.page{display:none;padding:20px;}
+.active{display:block;}
+
+.container{
+  max-width:480px;
+  margin:auto;
+  background:#fff;
+  padding:20px;
+  border-radius:14px;
+  box-shadow:0 0 12px #cbd5e1;
+}
+
+h2{color:#0f172a;}
+
+button{
+  padding:12px 18px;
+  margin:8px;
+  font-size:16px;
+  border:none;
+  border-radius:8px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+}
+
+.words{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:10px;
+  margin:15px 0;
+}
+
+.word{
+  padding:10px 16px;
+  background:#dbeafe;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+#sentence{
+  min-height:40px;
+  border:2px dashed #94a3b8;
+  border-radius:8px;
+  padding:10px;
+}
+
+#result{font-size:20px;margin:10px;}
+</style>
+</head>
+
+<body>
+
+<!-- HOME -->
+<div class="page active" id="home">
+  <div class="container">
+    <h2>Sentence Builder App</h2>
+    <button onclick="startLevel('beginner')">Beginner</button><br>
+    <button onclick="startLevel('medium')">Medium</button><br>
+    <button onclick="startLevel('advanced')">Advanced</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div class="page" id="game">
+  <div class="container">
+    <h2 id="levelName"></h2>
+    <div class="words" id="wordBox"></div>
+    <div id="sentence"></div>
+    <div id="result"></div>
+  </div>
+</div>
+
+<!-- SCORE -->
+<div class="page" id="scorePage">
+  <div class="container">
+    <h2>Score</h2>
+    <p id="scoreText"></p>
+    <button onclick="goHome()">Home</button>
+  </div>
+</div>
+
+<script>
+/* ================= LEVEL DATA ================= */
+
+let levels = {
+
+  /* ✅ BEGINNER – 5 SENTENCES – SIMPLE PRESENT (INDEFINITE) */
+  beginner:[
+    ["I","am","a","student"],
+    ["She","works","hard"],
+    ["He","plays","cricket"],
+    ["We","learn","English"],
+    ["They","live","in","India"]
+  ],
+
+  /* MEDIUM */
+  medium:[
+    ["She","is","teaching","English"],
+    ["They","are","learning","fast"],
+    ["I","have","completed","my","work"]
+  ],
+
+  /* ADVANCED */
+  advanced:[
+    ["He","had","finished","the","task"],
+    ["They","will","be","waiting","for","us"],
+    ["She","will","have","achieved","success"]
+  ]
+};
+
+let current=[];
+let index=0;
+let userSentence="";
+let right=0;
+let wrong=0;
+
+/* ================= FUNCTIONS ================= */
+
+function show(page){
+ document.querySelectorAll('.page')
+   .forEach(p=>p.classList.remove('active'));
+ document.getElementById(page).classList.add('active');
+}
+
+function startLevel(level){
+ current=levels[level];
+ index=0; right=0; wrong=0;
+ document.getElementById("levelName").innerText =
+   level.toUpperCase()+" LEVEL";
+ show("game");
+ loadSentence();
+}
+
+function loadSentence(){
+ userSentence="";
+ document.getElementById("sentence").innerText="";
+ document.getElementById("result").innerText="";
+
+ let words=[...current[index]]
+   .sort(()=>Math.random()-0.5);
+
+ let box=document.getElementById("wordBox");
+ box.innerHTML="";
+ words.forEach(w=>{
+   box.innerHTML +=
+   `<div class="word" onclick="addWord('${w}')">${w}</div>`;
+ });
+}
+
+function addWord(w){
+ userSentence += w+" ";
+ document.getElementById("sentence").innerText = userSentence;
+
+ let correct = current[index].join(" ")+" ";
+
+ if(userSentence.length === correct.length){
+   if(userSentence === correct){
+     right++;
+     document.getElementById("result").innerHTML="✅ Correct";
+   }else{
+     wrong++;
+     document.getElementById("result").innerHTML="❌ Wrong";
+   }
+   /* 🔥 WRONG or RIGHT → AUTO NEXT */
+   setTimeout(nextSentence,800);
+ }
+}
+
+function nextSentence(){
+ index++;
+ if(index < current.length){
+   loadSentence();
+ }else{
+   showScore();
+ }
+}
+
+function showScore(){
+ show("scorePage");
+ document.getElementById("scoreText").innerHTML =
+   "Right: "+right+"<br>Wrong: "+wrong;
+}
+
+function goHome(){
+ show("home");
+}
+</script>
+
+</body>
+</html>
